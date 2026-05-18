@@ -102,17 +102,6 @@ export default function Input({
             transition-all
           "
         />
-        {(internalError || error) && (
-          <span
-            className="
-              mt-2
-              text-sm
-              text-red-300
-            "
-          >
-            {internalError || error}
-          </span>
-        )}
 
         {isPassword && (
           <button
@@ -133,6 +122,17 @@ export default function Input({
           </button>
         )}
       </div>
+      {(internalError || error) && (
+        <span
+          className="
+              mt-2
+              text-sm
+              text-red-300
+            "
+        >
+          {internalError || error}
+        </span>
+      )}
     </div>
   );
 }

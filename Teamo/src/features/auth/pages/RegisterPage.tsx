@@ -75,7 +75,7 @@ export default function LoginPage() {
             z-10
             w-full
             max-w-[45rem]
-            h-[46rem]
+            min-h-[46rem]
             rounded-[40px]
             border
             border-white/20
@@ -132,7 +132,7 @@ export default function LoginPage() {
               passwordValidation
             />
 
-            <Button onClick={handleRegister}>ورود</Button>
+            <Button onClick={handleRegister}>ثبت نام</Button>
 
             <div className="mt-6 flex items-center justify-center gap-2 text-sm">
               <span className="text-white/60">حساب کاربری دارید؟</span>

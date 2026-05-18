@@ -60,7 +60,7 @@ export default function LoginPage() {
             z-10
             w-full
             max-w-[45rem]
-            h-[46rem]
+            min-h-[46rem]
             rounded-[40px]
             border
             border-white/20
