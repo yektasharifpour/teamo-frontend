@@ -9,6 +9,7 @@ export default function Button({ children, onClick }: ButtonProps) {
       type="button"
       onClick={onClick}
       className="
+      mt-[2rem]
           w-full
           rounded-2xl
           bg-gradient-to-r
@@ -23,6 +24,7 @@ export default function Button({ children, onClick }: ButtonProps) {
           hover:scale-[1.02]
           hover:shadow-[0_0_40px_rgba(255,0,110,0.55)]
           active:scale-[0.98]
+
           
         "
     >

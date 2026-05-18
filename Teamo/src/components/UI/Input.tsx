@@ -7,6 +7,7 @@ type InputProps = {
   placeholder?: string;
   numeric?: boolean;
   passwordValidation?: boolean;
+  error?: string;
 };
 
 export default function Input({
@@ -15,11 +16,12 @@ export default function Input({
   placeholder,
   numeric = false,
   passwordValidation = false,
+  error = "",
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const isPassword = type === "password";
-  const [error, setError] = useState("");
+  const [internalError, setInternalError] = useState("");
 
   return (
     <div className="flex flex-col gap-2">
@@ -45,11 +47,11 @@ export default function Input({
             // Numeric Validation
             if (numeric) {
               if (/[^0-9]/.test(value)) {
-                setError("فقط عدد مجاز است");
+                setInternalError("فقط عدد مجاز است");
               } else if (value.length === 11 && !value.startsWith("0")) {
-                setError("شماره همراه نامعتبر است");
+                setInternalError("شماره همراه نامعتبر است");
               } else {
-                setError("");
+                setInternalError("");
               }
 
               e.currentTarget.value = value.replace(/\D/g, "");
@@ -59,26 +61,26 @@ export default function Input({
             if (passwordValidation) {
               // فقط کاراکترهای مجاز
               if (/[^A-Za-z0-9@#!\-]/.test(value)) {
-                setError(
+                setInternalError(
                   "رمز عبور باید فقط شامل حروف انگلیسی، اعداد و @#!- باشد"
                 );
               }
 
               // حداقل ۸ کاراکتر
               else if (value.length < 8) {
-                setError("رمز عبور باید حداقل ۸ کاراکتر باشد");
+                setInternalError("رمز عبور باید حداقل ۸ کاراکتر باشد");
               }
 
               // حداقل یک حرف بزرگ
               else if (!/[A-Z]/.test(value)) {
-                setError("رمز عبور باید حداقل یک حرف بزرگ داشته باشد");
+                setInternalError("رمز عبور باید حداقل یک حرف بزرگ داشته باشد");
               }
 
               // حداقل یک کاراکتر خاص
               else if (!/[@#!\-]/.test(value)) {
-                setError("رمز عبور باید شامل یکی از @#!- باشد");
+                setInternalError("رمز عبور باید شامل یکی از @#!- باشد");
               } else {
-                setError("");
+                setInternalError("");
               }
             }
           }}
@@ -100,7 +102,7 @@ export default function Input({
             transition-all
           "
         />
-        {error && (
+        {(internalError || error) && (
           <span
             className="
               mt-2
@@ -108,7 +110,7 @@ export default function Input({
               text-red-300
             "
           >
-            {error}
+            {internalError || error}
           </span>
         )}
 
@@ -119,7 +121,8 @@ export default function Input({
             className="
               absolute
               left-4
-              top-1/2
+              top-[50%]
+              h-[56px]
               -translate-y-1/2
               text-white/50
               transition
