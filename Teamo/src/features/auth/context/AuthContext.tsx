@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import type { User } from "../types/user";
+import { getCurrentUser } from "../../../services/authService";
 
 interface AuthContextType {
   user: User | null;
@@ -28,11 +29,31 @@ export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const restoreUser = async () => {
+      const storedToken = localStorage.getItem("token");
 
-    if (storedToken) {
-      setToken(storedToken);
-    }
+      if (!storedToken) {
+        return;
+      }
+
+      try {
+        setToken(storedToken);
+
+        const currentUser = await getCurrentUser(storedToken);
+
+        setUser(currentUser);
+      } catch (error) {
+        console.error(error);
+
+        localStorage.removeItem("token");
+
+        setToken(null);
+
+        setUser(null);
+      }
+    };
+
+    restoreUser();
   }, []);
 
   const login = (token: string, user: User) => {
