@@ -43,7 +43,7 @@ export default function LoginPage() {
 
       if (!data.success && !data.token) {
         auth.logout();
-
+        console.log(data);
         if (data.message === "Invalid phone or password") {
           setError("نام کاربری یا رمز عبور نادرست است");
         } else {
