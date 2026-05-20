@@ -2,15 +2,15 @@ import { render, screen } from "@testing-library/react";
 
 import userEvent from "@testing-library/user-event";
 
-import LoginPage from "./LoginPage";
+import LoginPage from "../LoginPage";
 
-import * as authService from "../../../services/authService";
+import * as authService from "../../../../services/authService";
 
 import { vi } from "vitest";
 
 import { MemoryRouter } from "react-router-dom";
 
-import { AuthProvider } from "../context/AuthContext";
+import { AuthProvider } from "../../context/AuthContext";
 
 vi.spyOn(authService, "login").mockResolvedValue({
   success: false,

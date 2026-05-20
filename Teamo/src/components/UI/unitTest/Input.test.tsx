@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 
 import userEvent from "@testing-library/user-event";
 
-import Input from "./Input";
+import Input from "../Input";
 
 describe("Input Component", () => {
   it("shows password validation error", async () => {
