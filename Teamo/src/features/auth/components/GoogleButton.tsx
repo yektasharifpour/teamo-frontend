@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useAuth } from "../../../hooks/useAuth";
 import { googleLogin } from "../../../services/authService";
 
 declare global {
@@ -9,6 +10,7 @@ declare global {
 
 export default function GoogleButton() {
   const hiddenButtonRef = useRef<HTMLDivElement>(null);
+  const auth = useAuth();
 
   useEffect(() => {
     const initializeGoogle = () => {
@@ -40,7 +42,7 @@ export default function GoogleButton() {
 
       console.log("Backend JWT:", data.token);
 
-      localStorage.setItem("token", data.token);
+      auth.login(data.token, data.user);
     } catch (error) {
       console.error(error);
     }

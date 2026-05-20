@@ -6,6 +6,8 @@ import Input from "../../../components/UI/Input";
 import Button from "../../../components/UI/Buttons";
 import logo from "../../../assets/shapes/logo 1.svg";
 import brand from "../../../assets/shapes/brand 1.svg";
+import { login } from "../../../services/authService";
+import { useAuth } from "../../../hooks/useAuth";
 import { X } from "lucide-react";
 
 export default function LoginPage() {
@@ -15,34 +17,51 @@ export default function LoginPage() {
   };
   const [showErrorToast, setShowErrorToast] = useState(false);
   const navigate = useNavigate();
-  const handleLogin = () => {
-    const inputs = document.querySelectorAll("input");
+  const auth = useAuth();
 
-    let hasEmptyField = false;
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-    inputs.forEach((input) => {
-      if (!input.value) {
-        hasEmptyField = true;
+  const [password, setPassword] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [error, setError] = useState("");
+  const handleLogin = async () => {
+    try {
+      setIsLoading(true);
+
+      setError("");
+      if (
+        password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/[@#!\-]/.test(password) ||
+        /[^A-Za-z0-9@#!\-]/.test(password)
+      ) {
+        return;
       }
-    });
+      const data = await login(phoneNumber, password);
 
-    if (hasEmptyField) {
-      setShowErrorToast(true);
+      if (!data.success && !data.token) {
+        auth.logout();
 
-      setTimeout(() => {
-        setShowErrorToast(false);
-      }, 4000);
+        if (data.message === "Invalid phone or password") {
+          setError("نام کاربری یا رمز عبور نادرست است");
+        } else {
+          setError("خطایی رخ داده است");
+        }
 
-      return;
+        return;
+      }
+      auth.login(data.token, data.user);
+
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+
+      setError("Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
-
-    setShowModal(true);
-
-    setTimeout(() => {
-      setShowModal(false);
-
-      navigate("/register");
-    }, 4000);
   };
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1f1b4b]">
@@ -102,14 +121,31 @@ export default function LoginPage() {
 
           {/* Form */}
           <div className="mt-3 space-y-1">
-            <Input label="شماره همراه" placeholder="09123456789" numeric />
+            <Input
+              label="شماره همراه"
+              placeholder="09123456789"
+              numeric
+              value={phoneNumber}
+              onChange={(e) => {
+                setError("");
+
+                setPhoneNumber(e.target.value);
+              }}
+            />
 
             <Input
               label="رمز عبور"
               type="password"
               placeholder="••••••••"
               passwordValidation
+              value={password}
+              onChange={(e) => {
+                setError("");
+
+                setPassword(e.target.value);
+              }}
             />
+            {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
             <div className="flex justify-start">
               <Link
                 to="/forgot-password"
@@ -124,7 +160,9 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button onClick={handleLogin}>ورود</Button>
+            <Button onClick={handleLogin}>
+              {isLoading ? "در حال ورود..." : "ورود"}
+            </Button>
 
             <div className="pt-2">
               <GoogleButton />
