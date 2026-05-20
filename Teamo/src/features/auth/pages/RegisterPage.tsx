@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { register } from "../../../services/authService";
+import { useAuth } from "../../../hooks/useAuth";
 import AuthBackground from "../components/AuthBackground";
 import GoogleButton from "../components/GoogleButton";
 import Input from "../../../components/UI/Input";
@@ -16,48 +18,60 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
   const [showErrorToast, setShowErrorToast] = useState(false);
   const navigate = useNavigate();
-  const handleRegister = () => {
-    const inputs = document.querySelectorAll("input");
+  const auth = useAuth();
 
-    let hasEmptyField = false;
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-    inputs.forEach((input) => {
-      if (!input.value) {
-        hasEmptyField = true;
+  const [password, setPassword] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [error, setError] = useState("");
+  const handleRegister = async () => {
+    try {
+      setError("");
+      console.log({
+        password,
+        confirmPassword,
+      });
+      if (password !== confirmPassword) {
+        setError("رمزهای عبور یکسان نیستند");
+
+        return;
       }
-    });
 
-    if (hasEmptyField) {
-      setShowErrorToast(true);
+      setIsLoading(true);
+
+      const data = await register(phoneNumber, password);
+
+      if (!data.token) {
+        if (data.message === "Phone number already exists") {
+          setError("این شماره قبلاً ثبت شده است");
+        } else {
+          setError("خطایی رخ داده است");
+        }
+
+        return;
+      }
+
+      auth.login(data.token, data.user);
+
+      setShowModal(true);
 
       setTimeout(() => {
-        setShowErrorToast(false);
-      }, 4000);
+        setShowModal(false);
 
-      return;
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+
+      setError("خطایی رخ داده است");
+    } finally {
+      setIsLoading(false);
     }
-    const passwordInputs = document.querySelectorAll('input[type="password"]');
-
-    const password = (passwordInputs[0] as HTMLInputElement).value;
-
-    const repeatPassword = (passwordInputs[1] as HTMLInputElement).value;
-
-    // چک یکسان بودن
-    if (password !== repeatPassword) {
-      setPasswordError("رمز عبور و تکرار آن یکسان نیستند");
-
-      return;
-    }
-
-    setPasswordError("");
-
-    setShowModal(true);
-
-    setTimeout(() => {
-      setShowModal(false);
-
-      navigate("/register");
-    }, 4000);
   };
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1f1b4b]">
@@ -117,22 +131,56 @@ export default function LoginPage() {
 
           {/* Form */}
           <div className="mt-3 space-y-1">
-            <Input label="شماره همراه" placeholder="09123456789" numeric />
+            <Input
+              label="شماره همراه"
+              placeholder="09123456789"
+              numeric
+              value={phoneNumber}
+              onChange={(e) => {
+                setError("");
 
+                setPhoneNumber(e.target.value);
+              }}
+            />
             <Input
               label="رمز عبور"
               type="password"
               placeholder="••••••••"
               passwordValidation
+              value={password}
+              onChange={(e) => {
+                setError("");
+
+                setPassword(e.target.value);
+              }}
             />
             <Input
               label="تکرار رمز عبور"
               type="password"
               placeholder="••••••••"
               passwordValidation
-            />
+              value={confirmPassword}
+              onChange={(e) => {
+                setError("");
 
-            <Button onClick={handleRegister}>ثبت نام</Button>
+                setConfirmPassword(e.target.value);
+              }}
+            />
+            {error && (
+              <p
+                className="
+                mt-2
+      
+                text-sm
+                text-red-300
+                "
+              >
+                {error}
+              </p>
+            )}
+            <Button onClick={handleRegister}>
+              {isLoading ? "در حال ثبت‌نام..." : "ثبت نام"}
+            </Button>
 
             <div className="mt-6 flex items-center justify-center gap-2 text-sm">
               <span className="text-white/60">حساب کاربری دارید؟</span>

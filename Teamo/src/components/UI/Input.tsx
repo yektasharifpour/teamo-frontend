@@ -8,6 +8,9 @@ type InputProps = {
   numeric?: boolean;
   passwordValidation?: boolean;
   error?: string;
+  value?: string;
+
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function Input({
@@ -17,6 +20,8 @@ export default function Input({
   numeric = false,
   passwordValidation = false,
   error = "",
+  value,
+  onChange,
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -41,6 +46,8 @@ export default function Input({
           placeholder={placeholder}
           inputMode={numeric ? "numeric" : undefined}
           pattern={numeric ? "[0-9]*" : undefined}
+          value={value}
+          onChange={onChange}
           onInput={(e) => {
             const value = e.currentTarget.value;
 
@@ -62,7 +69,7 @@ export default function Input({
               // فقط کاراکترهای مجاز
               if (/[^A-Za-z0-9@#!\-]/.test(value)) {
                 setInternalError(
-                  "رمز عبور باید فقط شامل حروف انگلیسی، اعداد و @#!- باشد"
+                  "رمز عبور باید فقط شامل حروف انگلیسی، اعداد و @#!- باشد",
                 );
               }
 
@@ -125,12 +132,12 @@ export default function Input({
       {(internalError || error) && (
         <span
           className="
-              mt-2
-              text-sm
-              text-red-300
-            "
+      mt-2
+      text-sm
+      text-red-300
+    "
         >
-          {internalError || error}
+          {internalError ? internalError : error}
         </span>
       )}
     </div>

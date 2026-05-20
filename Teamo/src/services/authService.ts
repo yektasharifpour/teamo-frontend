@@ -24,3 +24,35 @@ export async function getCurrentUser(token: string) {
 
   return response.json();
 }
+export async function login(phoneNumber: string, password: string) {
+  const response = await fetch(`${API_BASE_URL}/api/Auth/login`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      phoneNumber,
+      password,
+    }),
+  });
+
+  return response.json();
+}
+export async function register(phoneNumber: string, password: string) {
+  const response = await fetch(`${API_BASE_URL}/api/Auth/register`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      phoneNumber,
+      password,
+    }),
+  });
+
+  return response.json();
+}

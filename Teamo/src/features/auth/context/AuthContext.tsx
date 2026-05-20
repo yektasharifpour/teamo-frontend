@@ -71,7 +71,11 @@ export function AuthProvider({ children }: Props) {
 
     setUser(null);
   };
-
+  console.log({
+    user,
+    token,
+    isAuthenticated: !!token,
+  });
   return (
     <AuthContext.Provider
       value={{
