@@ -20,8 +20,7 @@ export default function GoogleButton() {
       }
 
       window.google.accounts.id.initialize({
-        client_id:
-          "784628432940-tcc72k02hdbucfteqthke5kr61b0o132.apps.googleusercontent.com",
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,
       });
 
