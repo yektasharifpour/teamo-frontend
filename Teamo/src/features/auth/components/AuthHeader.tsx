@@ -12,25 +12,36 @@ export default function AuthHeader({ title }: Props) {
       {/* Logo */}
       <div
         className="
-          mb-[2rem]
-          mt-[-1rem]
-          flex
-          flex-row
-          items-center
-          justify-center
-          px-[12rem]
+        mb-6
+        flex
+        items-center
+        justify-center
+        gap-2
         "
       >
-        <img src={logo} className="w-[5rem]" />
+        <img
+          src={logo}
+          className="    
+          h-8
+          w-auto
+          md:h-10"
+        />
 
-        <img src={brand} className="w-[5rem]" />
+        <img
+          src={brand}
+          className="   
+          h-8
+          w-auto
+          md:h-10"
+        />
       </div>
 
       <h2
         className="
-          text-[3rem]
-          font-bold
-          text-white
+        text-4xl
+        md:text-[3rem]
+        font-bold
+        text-white
         "
       >
         {title}
