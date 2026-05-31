@@ -1,29 +1,31 @@
 import { useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Input from "../../../components/UI/Input";
-
 import Button from "../../../components/UI/Buttons";
-
 import GoogleButton from "../components/GoogleButton";
 
 import { register } from "../../../services/authService";
-
 import { useAuth } from "../../../hooks/useAuth";
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+  onSuccess?: () => void;
+  onError?: (message: string) => void;
+}
+
+export default function RegisterForm({
+  onSuccess,
+  onError,
+}: RegisterFormProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [password, setPassword] = useState("");
-
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [passwordError, setPasswordError] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
-
-  const [error, setError] = useState("");
-
-  const navigate = useNavigate();
 
   const auth = useAuth();
 
@@ -31,46 +33,66 @@ export default function RegisterForm() {
     try {
       setIsLoading(true);
 
-      setError("");
+      setPasswordError("");
 
       // Password validation
-      if (
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[@#!\-]/.test(password) ||
-        /[^A-Za-z0-9@#!\-]/.test(password)
-      ) {
+      if (password.length < 8) {
+        setPasswordError("رمز عبور باید حداقل ۸ کاراکتر باشد");
+        return;
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        setPasswordError("رمز عبور باید حداقل یک حرف بزرگ انگلیسی داشته باشد");
+        return;
+      }
+
+      if (!/\d/.test(password)) {
+        setPasswordError("رمز عبور باید حداقل یک عدد داشته باشد");
+        return;
+      }
+
+      if (!/[@#!\-]/.test(password)) {
+        setPasswordError(
+          "رمز عبور باید حداقل یکی از کاراکترهای @ # ! - را داشته باشد",
+        );
+        return;
+      }
+
+      if (/[^A-Za-z0-9@#!\-]/.test(password)) {
+        setPasswordError("رمز عبور شامل کاراکترهای غیرمجاز است");
         return;
       }
 
       // Confirm password validation
       if (password !== confirmPassword) {
-        setError("رمزهای عبور یکسان نیستند");
-
+        setPasswordError("رمزهای عبور یکسان نیستند");
         return;
       }
 
       const data = await register(phoneNumber, password);
 
-      if (!data.success && !data.token) {
-        auth.logout();
+      console.log("REGISTER RESPONSE:", data);
 
-        if (data.message === "Phone number already exists") {
-          setError("این شماره قبلاً ثبت شده است");
-        } else {
-          setError("خطایی رخ داده است");
-        }
+      if (!data.token) {
+        const message =
+          data.message === "Phone number already exists"
+            ? "این شماره قبلاً ثبت شده است"
+            : data.message || "خطایی رخ داده است";
 
+        onError?.(message);
         return;
       }
 
       auth.login(data.token, data.user);
+      onSuccess?.();
 
-      navigate("/");
+      auth.login(data.token, data.user);
+
+      onSuccess?.();
     } catch (error) {
       console.error(error);
 
-      setError("Something went wrong");
+      onError?.("خطایی رخ داده است");
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +106,6 @@ export default function RegisterForm() {
         numeric
         value={phoneNumber}
         onChange={(e) => {
-          setError("");
-
           setPhoneNumber(e.target.value);
         }}
       />
@@ -97,8 +117,7 @@ export default function RegisterForm() {
         passwordValidation
         value={password}
         onChange={(e) => {
-          setError("");
-
+          setPasswordError("");
           setPassword(e.target.value);
         }}
       />
@@ -110,13 +129,14 @@ export default function RegisterForm() {
         passwordValidation
         value={confirmPassword}
         onChange={(e) => {
-          setError("");
-
+          setPasswordError("");
           setConfirmPassword(e.target.value);
         }}
       />
 
-      {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+      {passwordError && (
+        <p className="mt-2 text-sm text-red-300">{passwordError}</p>
+      )}
 
       <Button onClick={handleRegister}>
         {isLoading ? "در حال ثبت نام..." : "ثبت نام"}
