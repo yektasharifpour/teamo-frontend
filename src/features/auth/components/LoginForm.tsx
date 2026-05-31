@@ -1,66 +1,81 @@
 import { useState } from "react";
-
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import GoogleButton from "../components/GoogleButton";
 
 import Input from "../../../components/UI/Input";
-
 import Button from "../../../components/UI/Buttons";
 
 import { login } from "../../../services/authService";
-
 import { useAuth } from "../../../hooks/useAuth";
 
-export default function LoginForm() {
-  const [phoneNumber, setPhoneNumber] = useState("");
+interface LoginFormProps {
+  onSuccess?: () => void;
+  onError?: (message: string) => void;
+}
 
+export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [error, setError] = useState("");
-
-  const navigate = useNavigate();
+  const [passwordError, setPasswordError] = useState("");
 
   const auth = useAuth();
 
   const handleLogin = async () => {
     try {
       setIsLoading(true);
+      setPasswordError("");
 
-      setError("");
+      if (password.length < 8) {
+        setPasswordError("رمز عبور باید حداقل ۸ کاراکتر باشد");
+        return;
+      }
 
-      if (
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[@#!\-]/.test(password) ||
-        /[^A-Za-z0-9@#!\-]/.test(password)
-      ) {
+      if (!/[A-Z]/.test(password)) {
+        setPasswordError("رمز عبور باید حداقل یک حرف بزرگ انگلیسی داشته باشد");
+        return;
+      }
+
+      if (!/\d/.test(password)) {
+        setPasswordError("رمز عبور باید حداقل یک عدد داشته باشد");
+        return;
+      }
+
+      if (!/[@#!\-]/.test(password)) {
+        setPasswordError(
+          "رمز عبور باید حداقل یکی از کاراکترهای @ # ! - را داشته باشد",
+        );
+        return;
+      }
+
+      if (/[^A-Za-z0-9@#!\-]/.test(password)) {
+        setPasswordError("رمز عبور شامل کاراکترهای غیرمجاز است");
         return;
       }
 
       const data = await login(phoneNumber, password);
 
-      if (!data.success && !data.token) {
-        auth.logout();
+      console.log("LOGIN RESPONSE:", data);
 
-        if (data.message === "Invalid phone or password") {
-          setError("نام کاربری یا رمز عبور نادرست است");
-        } else {
-          setError("خطایی رخ داده است");
-        }
+      if (!data.token) {
+        const message =
+          data.message === "Invalid phone or password"
+            ? "نام کاربری یا رمز عبور نادرست است"
+            : data.message || "خطایی رخ داده است";
 
+        onError?.(message);
         return;
       }
 
       auth.login(data.token, data.user);
-
-      navigate("/");
+      onSuccess?.();
     } catch (error) {
       console.error(error);
 
-      setError("Something went wrong");
+      onError?.("خطایی رخ داده است");
     } finally {
       setIsLoading(false);
     }
@@ -74,8 +89,6 @@ export default function LoginForm() {
         numeric
         value={phoneNumber}
         onChange={(e) => {
-          setError("");
-
           setPhoneNumber(e.target.value);
         }}
       />
@@ -87,13 +100,14 @@ export default function LoginForm() {
         passwordValidation
         value={password}
         onChange={(e) => {
-          setError("");
-
+          setPasswordError("");
           setPassword(e.target.value);
         }}
       />
 
-      {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+      {passwordError && (
+        <p className="mt-2 text-sm text-red-300">{passwordError}</p>
+      )}
 
       <div className="flex justify-start">
         <Link

@@ -1,20 +1,22 @@
 import { useState } from "react";
 
 import AuthHeader from "../components/AuthHeader";
-
+import { Navigate, useNavigate } from "react-router-dom";
 import RegisterForm from "../components/RegisterForm";
 import AuthCard from "../components/AuthCard";
 import AuthToast from "../components/AuthToast";
 import AuthBackground from "../components/AuthBackground";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function LoginPage() {
+  const auth = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
   const [showErrorToast, setShowErrorToast] = useState(false);
-
+  if (auth.isAuthenticated && !showModal) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1f1b4b]">
       {/* Background Shapes */}
@@ -30,7 +32,15 @@ export default function LoginPage() {
         <AuthCard>
           <AuthHeader title="ثبت نام" />
 
-          <RegisterForm />
+          <RegisterForm
+            onSuccess={() => {
+              setShowModal(true);
+            }}
+            onError={(message) => {
+              setErrorMessage(message);
+              setShowErrorToast(true);
+            }}
+          />
         </AuthCard>
 
         {/* Form */}
@@ -38,16 +48,19 @@ export default function LoginPage() {
       {showModal && (
         <AuthToast
           type="success"
-          title="ثبت نام موفقیت‌آمیز بود"
-          message="در حال انتقال..."
-          onClose={closeModal}
+          title="ثبت‌نام موفقیت‌آمیز بود"
+          message="در حال انتقال به صفحه ثبت نام"
+          onClose={() => {
+            setShowModal(false);
+            navigate("/login");
+          }}
         />
       )}
       {showErrorToast && (
         <AuthToast
           type="error"
           title="خطا"
-          message="لطفاً تمام فیلدها را پر کنید"
+          message={errorMessage}
           onClose={() => setShowErrorToast(false)}
         />
       )}
