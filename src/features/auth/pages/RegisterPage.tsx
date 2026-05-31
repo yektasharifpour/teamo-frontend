@@ -14,9 +14,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [showErrorToast, setShowErrorToast] = useState(false);
-  if (auth.isAuthenticated && !showModal) {
-    return <Navigate to="/" replace />;
-  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1f1b4b]">
       {/* Background Shapes */}

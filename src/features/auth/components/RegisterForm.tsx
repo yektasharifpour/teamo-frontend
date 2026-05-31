@@ -7,7 +7,7 @@ import Button from "../../../components/UI/Buttons";
 import GoogleButton from "../components/GoogleButton";
 
 import { register } from "../../../services/authService";
-import { useAuth } from "../../../hooks/useAuth";
+
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -27,7 +27,7 @@ export default function RegisterForm({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const auth = useAuth();
+  
 
   const handleRegister = async () => {
     try {
@@ -82,11 +82,6 @@ export default function RegisterForm({
         onError?.(message);
         return;
       }
-
-      auth.login(data.token, data.user);
-      onSuccess?.();
-
-      auth.login(data.token, data.user);
 
       onSuccess?.();
     } catch (error) {
