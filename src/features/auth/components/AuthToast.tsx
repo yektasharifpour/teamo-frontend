@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useEffect } from "react";
 
 type Props = {
   title: string;
@@ -12,6 +13,13 @@ type Props = {
 
 export default function AuthToast({ title, message, type, onClose }: Props) {
   const isSuccess = type === "success";
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
 
   return (
     <div

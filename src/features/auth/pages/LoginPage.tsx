@@ -4,13 +4,20 @@ import AuthBackground from "../components/AuthBackground";
 import AuthToast from "../components/AuthToast";
 import AuthCard from "../components/AuthCard";
 import AuthHeader from "../components/AuthHeader";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function LoginPage() {
+  const auth = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("");
   const [showErrorToast, setShowErrorToast] = useState(false);
+  if (auth.isAuthenticated) {
+    if (auth.isAuthenticated && !showModal) {
+      return <Navigate to="/" replace />;
+    }
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1f1b4b]">
@@ -27,7 +34,15 @@ export default function LoginPage() {
           <AuthHeader title="ورود" />
 
           {/* Form */}
-          <LoginForm />
+          <LoginForm
+            onSuccess={() => {
+              setShowModal(true);
+            }}
+            onError={(message) => {
+              setErrorMessage(message);
+              setShowErrorToast(true);
+            }}
+          />
         </AuthCard>
       </div>
       {showModal && (
@@ -35,14 +50,17 @@ export default function LoginPage() {
           type="success"
           title="ورود موفقیت‌آمیز بود"
           message="در حال انتقال..."
-          onClose={closeModal}
+          onClose={() => {
+            setShowModal(false);
+            navigate("/");
+          }}
         />
       )}
       {showErrorToast && (
         <AuthToast
           type="error"
           title="خطا"
-          message="لطفاً تمام فیلدها را پر کنید"
+          message={errorMessage}
           onClose={() => setShowErrorToast(false)}
         />
       )}
