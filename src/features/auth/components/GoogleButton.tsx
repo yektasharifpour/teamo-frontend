@@ -48,8 +48,7 @@ export default function GoogleButton() {
   };
 
   const handleGoogleLogin = () => {
-    const googleButton =
-      hiddenButtonRef.current?.querySelector("div[role=button]");
+    const googleButton = hiddenButtonRef.current?.firstElementChild;
 
     if (googleButton instanceof HTMLElement) {
       googleButton.click();
