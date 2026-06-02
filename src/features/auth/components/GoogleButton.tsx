@@ -2,9 +2,30 @@ import { useEffect, useRef } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { googleLogin } from "../../../services/authService";
 
+interface GoogleCredentialResponse {
+  credential: string;
+}
+
 declare global {
   interface Window {
-    google: any;
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: GoogleCredentialResponse) => void;
+          }) => void;
+
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme?: string;
+              size?: string;
+            },
+          ) => void;
+        };
+      };
+    };
   }
 }
 
@@ -35,7 +56,9 @@ export default function GoogleButton() {
     initializeGoogle();
   }, []);
 
-  const handleCredentialResponse = async (response: any) => {
+  const handleCredentialResponse = async (
+    response: GoogleCredentialResponse,
+  ) => {
     try {
       const data = await googleLogin(response.credential);
 
