@@ -53,13 +53,11 @@ describe("Login Page", () => {
 
     await userEvent.type(passwordInput, "Test@123");
 
-    const buttons = screen.getAllByRole("button");
+    const loginButton = screen.getByRole("button", {
+      name: "ورود",
+    });
 
-    const loginButton = buttons.find((button) => button.textContent === "ورود");
-
-    expect(loginButton).toBeDefined();
-
-    await userEvent.click(loginButton!);
+    await userEvent.click(loginButton);
 
     expect(authService.login).toHaveBeenCalled();
 
@@ -95,13 +93,11 @@ describe("Login Page", () => {
 
     await userEvent.type(passwordInput, "Test@123");
 
-    const buttons = screen.getAllByRole("button");
+    const loginButton = screen.getByRole("button", {
+      name: "ورود",
+    });
 
-    const loginButton = buttons.find((button) => button.textContent === "ورود");
-
-    expect(loginButton).toBeDefined();
-
-    await userEvent.click(loginButton!);
+    await userEvent.click(loginButton);
 
     expect(authService.login).toHaveBeenCalled();
   });
