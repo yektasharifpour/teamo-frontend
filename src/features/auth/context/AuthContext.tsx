@@ -53,7 +53,7 @@ export function AuthProvider({ children }: Props) {
       }
     };
 
-    restoreUser();
+    void restoreUser();
   }, []);
 
   const login = (token: string, user: User) => {

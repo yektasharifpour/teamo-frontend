@@ -59,7 +59,9 @@ export default function LoginPage() {
           type="error"
           title="خطا"
           message={errorMessage}
-          onClose={() => setShowErrorToast(false)}
+          onClose={() => {
+            setShowErrorToast(false);
+          }}
         />
       )}
     </div>

@@ -18,7 +18,9 @@ export default function AuthToast({ title, message, type, onClose }: Props) {
       onClose();
     }, 4000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [onClose]);
 
   return (
