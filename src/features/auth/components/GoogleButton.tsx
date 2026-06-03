@@ -2,26 +2,59 @@ import { useEffect, useRef } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { googleLogin } from "../../../services/authService";
 
+interface GoogleCredentialResponse {
+  credential: string;
+}
+
 declare global {
   interface Window {
-    google: any;
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: GoogleCredentialResponse) => void;
+          }) => void;
+
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme?: string;
+              size?: string;
+            },
+          ) => void;
+        };
+      };
+    };
   }
 }
 
 export default function GoogleButton() {
   const hiddenButtonRef = useRef<HTMLDivElement>(null);
   const auth = useAuth();
+  const handleCredentialResponse = async (
+    response: GoogleCredentialResponse,
+  ) => {
+    try {
+      const data = await googleLogin(response.credential);
 
+      auth.login(data.token, data.user);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     const initializeGoogle = () => {
-      if (!window.google) {
+      if (typeof window.google === "undefined") {
         setTimeout(initializeGoogle, 500);
         return;
       }
 
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
+        callback: (response) => {
+          void handleCredentialResponse(response);
+        },
       });
 
       if (hiddenButtonRef.current) {
@@ -35,21 +68,8 @@ export default function GoogleButton() {
     initializeGoogle();
   }, []);
 
-  const handleCredentialResponse = async (response: any) => {
-    try {
-      const data = await googleLogin(response.credential);
-
-      console.log("Backend JWT:", data.token);
-
-      auth.login(data.token, data.user);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const handleGoogleLogin = () => {
-    const googleButton =
-      hiddenButtonRef.current?.querySelector("div[role=button]");
+    const googleButton = hiddenButtonRef.current?.firstElementChild;
 
     if (googleButton instanceof HTMLElement) {
       googleButton.click();

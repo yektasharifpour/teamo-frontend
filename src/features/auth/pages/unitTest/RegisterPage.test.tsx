@@ -36,15 +36,11 @@ describe("Register Page", () => {
 
     await userEvent.type(confirmPasswordInput, "Wrong@123");
 
-    const buttons = screen.getAllByRole("button");
+    const registerButton = screen.getByRole("button", {
+      name: "ثبت نام",
+    });
 
-    const registerButton = buttons.find(
-      (button) => button.textContent === "ثبت نام",
-    );
-
-    expect(registerButton).toBeDefined();
-
-    await userEvent.click(registerButton!);
+    await userEvent.click(registerButton);
 
     const error = await screen.findByText("رمزهای عبور یکسان نیستند");
 
@@ -73,15 +69,11 @@ describe("Register Page", () => {
 
     await userEvent.type(confirmPasswordInput, "Test@123");
 
-    const buttons = screen.getAllByRole("button");
+    const registerButton = screen.getByRole("button", {
+      name: "ثبت نام",
+    });
 
-    const registerButton = buttons.find(
-      (button) => button.textContent === "ثبت نام",
-    );
-
-    expect(registerButton).toBeDefined();
-
-    await userEvent.click(registerButton!);
+    await userEvent.click(registerButton);
 
     expect(authService.register).toHaveBeenCalled();
 

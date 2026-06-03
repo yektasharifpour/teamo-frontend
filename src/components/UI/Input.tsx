@@ -113,7 +113,9 @@ export default function Input({
         {isPassword && (
           <button
             type="button"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={() => {
+              setShowPassword((prev) => !prev);
+            }}
             className="
               absolute
               left-4

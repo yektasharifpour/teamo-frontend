@@ -13,10 +13,8 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorToast, setShowErrorToast] = useState(false);
-  if (auth.isAuthenticated) {
-    if (auth.isAuthenticated && !showModal) {
-      return <Navigate to="/" replace />;
-    }
+  if (auth.isAuthenticated && !showModal) {
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -61,7 +59,9 @@ export default function LoginPage() {
           type="error"
           title="خطا"
           message={errorMessage}
-          onClose={() => setShowErrorToast(false)}
+          onClose={() => {
+            setShowErrorToast(false);
+          }}
         />
       )}
     </div>
