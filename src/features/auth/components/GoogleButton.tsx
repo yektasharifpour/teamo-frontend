@@ -45,14 +45,12 @@ export default function GoogleButton() {
   };
   useEffect(() => {
     const initializeGoogle = () => {
-      const google = window.google;
-
-      if (!google) {
+      if (typeof window.google === "undefined") {
         setTimeout(initializeGoogle, 500);
         return;
       }
 
-      google.accounts.id.initialize({
+      window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: (response) => {
           void handleCredentialResponse(response);
@@ -60,7 +58,7 @@ export default function GoogleButton() {
       });
 
       if (hiddenButtonRef.current) {
-        google.accounts.id.renderButton(hiddenButtonRef.current, {
+        window.google.accounts.id.renderButton(hiddenButtonRef.current, {
           theme: "outline",
           size: "large",
         });
