@@ -45,18 +45,22 @@ export default function GoogleButton() {
   };
   useEffect(() => {
     const initializeGoogle = () => {
-      if (!window.google) {
+      const google = window.google;
+
+      if (!google) {
         setTimeout(initializeGoogle, 500);
         return;
       }
 
-      window.google.accounts.id.initialize({
+      google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
+        callback: (response) => {
+          void handleCredentialResponse(response);
+        },
       });
 
       if (hiddenButtonRef.current) {
-        window.google.accounts.id.renderButton(hiddenButtonRef.current, {
+        google.accounts.id.renderButton(hiddenButtonRef.current, {
           theme: "outline",
           size: "large",
         });
