@@ -8,7 +8,7 @@ interface GoogleCredentialResponse {
 
 declare global {
   interface Window {
-    google: {
+    google?: {
       accounts: {
         id: {
           initialize: (config: {
@@ -32,7 +32,17 @@ declare global {
 export default function GoogleButton() {
   const hiddenButtonRef = useRef<HTMLDivElement>(null);
   const auth = useAuth();
+  const handleCredentialResponse = async (
+    response: GoogleCredentialResponse,
+  ) => {
+    try {
+      const data = await googleLogin(response.credential);
 
+      auth.login(data.token, data.user);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     const initializeGoogle = () => {
       if (!window.google) {
@@ -55,20 +65,6 @@ export default function GoogleButton() {
 
     initializeGoogle();
   }, []);
-
-  const handleCredentialResponse = async (
-    response: GoogleCredentialResponse,
-  ) => {
-    try {
-      const data = await googleLogin(response.credential);
-
-      console.log("Backend JWT:", data.token);
-
-      auth.login(data.token, data.user);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleGoogleLogin = () => {
     const googleButton = hiddenButtonRef.current?.firstElementChild;

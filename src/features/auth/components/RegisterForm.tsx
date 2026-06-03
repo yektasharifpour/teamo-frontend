@@ -138,7 +138,7 @@ export default function RegisterForm({
         <p className="mt-2 text-sm text-red-300">{passwordError}</p>
       )}
 
-      <Button onClick={handleRegister}>
+      <Button onClick={() => void handleRegister()}>
         {isLoading ? "در حال ثبت نام..." : "ثبت نام"}
       </Button>
 

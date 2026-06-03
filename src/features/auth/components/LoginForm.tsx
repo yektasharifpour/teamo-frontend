@@ -58,8 +58,6 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
 
       const data = await login(phoneNumber, password);
 
-      console.log("LOGIN RESPONSE:", data);
-
       if (!data.token) {
         const message =
           data.message === "Invalid phone or password"
@@ -123,7 +121,7 @@ export default function LoginForm({ onSuccess, onError }: LoginFormProps) {
         </Link>
       </div>
 
-      <Button onClick={handleLogin}>
+      <Button onClick={() => void handleLogin()}>
         {isLoading ? "در حال ورود..." : "ورود"}
       </Button>
 
